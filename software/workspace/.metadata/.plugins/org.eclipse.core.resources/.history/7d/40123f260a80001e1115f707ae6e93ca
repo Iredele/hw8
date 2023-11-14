@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include "altera_avalon_timer_regs.h"
+#include "sys/alt_irq.h"
+#include "system.h"
+#include "alt_types.h"
+#include <unistd.h>
+
+
+char start[5] = {0x40, 0x79, 0xA4, 0xB0, 0x90};
+
+
+
+
+
+int main(){
+
+
+	return 0;
+}
+
+
+
+
+
+
+static void sys_init(){
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_0_BASE,start[0]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_1_BASE,start[1]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_2_BASE,start[2]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_3_BASE,start[3]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_4_BASE,start[4]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_5_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_6_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_7_BASE,0xFF);
+
+		IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE,0x0);
+}

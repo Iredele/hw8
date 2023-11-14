@@ -1,0 +1,158 @@
+#include <stdio.h>
+#include <io.h>
+#include "system.h"
+#include "altera_avalon_timer_regs.h"
+#include "altera_avalon_timer.h"
+#include "altera_avalon_pio_regs.h"
+#include "sys/alt_irq.h"
+#include "sys/alt_stdio.h"
+#include "alt_types.h"
+
+
+char start[5] = {0x07, 0xAF, 0x08, 0x07, 0x92};
+volatile int edge_capture;
+volatile int toggle = 0xFFFF;
+
+static void pio_init();
+static void handle_button_interrupts(void* context);
+static void sys_init();
+static void clear();
+int random_time();
+static void start_game();
+static void game_isr();
+
+
+int main(){
+
+	pio_init();
+	return 0;
+}
+
+
+
+
+static void pio_init(){
+	void* edge_capture_ptr = (void*)&edge_capture;
+
+	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0xf);
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+
+	alt_ic_isr_register(KEYS_IRQ_INTERRUPT_CONTROLLER_ID, KEYS_IRQ, (void *) handle_button_interrupts, edge_capture_ptr, 0x00);
+}
+
+static void handle_button_interrupts(void* context){
+	volatile int* edge_capture_ptr = (volatile int*) context;
+
+	*edge_capture_ptr = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+	//sw_val = IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE);
+	//sw_val = sw_val & 0xFF;
+
+	if(*edge_capture_ptr == 1){
+		sys_init();
+	}
+
+	if(*edge_capture_ptr == 2){
+		start_game();
+	}
+//
+//	if(*edge_capture_ptr == 4){
+//			key3_isr();
+//		}
+
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+	IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+}
+
+static void sys_init(){
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_0_BASE,start[0]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_1_BASE,start[1]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_2_BASE,start[2]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_3_BASE,start[3]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_4_BASE,start[4]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_5_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_6_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_7_BASE,0xFF);
+
+		IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE,0x0);
+
+		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+		IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+}
+
+static void game_timer_init()
+{
+    // Stop the timer
+	IOWR_ALTERA_AVALON_TIMER_CONTROL(SYSTEM_TIMER_BASE,
+				ALTERA_AVALON_TIMER_CONTROL_STOP_MSK);
+
+	// Set the timer period so it can be 1 second
+    int period = SYSTEM_TIMER_LOAD_VALUE * random_time();
+    int period_h = period >> 16;
+    int period_l = period & ALTERA_AVALON_TIMER_PERIODL_MSK;
+
+    IOWR_ALTERA_AVALON_TIMER_PERIODL(SYSTEM_TIMER_BASE, period_l);
+    IOWR_ALTERA_AVALON_TIMER_PERIODH(SYSTEM_TIMER_BASE, period_h);
+
+    // Start the timer
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(SYSTEM_TIMER_BASE,
+    			ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
+    			ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
+    			ALTERA_AVALON_TIMER_CONTROL_START_MSK
+    			);
+
+    alt_ic_isr_register(SYSTEM_TIMER_IRQ_INTERRUPT_CONTROLLER_ID, SYSTEM_TIMER_IRQ, game_isr, NULL, NULL);
+}
+
+static void clear(){
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_0_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_1_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_2_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_3_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_4_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_5_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_6_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_7_BASE,0xFF);
+
+		IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE,0x0);
+
+		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+		IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+}
+
+static void start_game(){
+	// clear the display
+	IOWR_ALTERA_AVALON_TIMER_STATUS(SYSTEM_TIMER_BASE, 0);
+	clear();
+	game_timer_init();
+
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+	IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+
+	// start the timer and count every millisecond tick
+
+}
+
+
+static void game_isr(){
+	toggle == 0xFFFF ? 0x0 : 0xFFFF;
+	IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE,toggle);
+
+}
+
+
+
+
+
+int random_time() {
+    int lower = 2000;
+    int upper = 5000; //change to 15000
+    int range = (upper - lower) / 500; // Calculate the number of increments
+
+    int randomNumber = (rand() % (range + 1)) * 500 + lower; // Generate a random number in increments of 500
+
+    // printf("Random number: %d\n", randomNumber);
+
+    return randomNumber;
+}

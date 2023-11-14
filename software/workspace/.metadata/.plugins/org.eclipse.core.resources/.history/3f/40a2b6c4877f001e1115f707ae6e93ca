@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include "altera_avalon_timer_regs.h"
+#include "sys/alt_irq.h"
+
+volatile int timer_ticks = 0;
+volatile int delay_completed = 0;
+
+// Function to initialize the system timer interrupt
+static void timer_init();
+
+// System timer interrupt service routine
+static void timer_isr(void *context, alt_u32 id);
+
+// Delay function using the system timer
+void delay_ms(int milliseconds);
+
+int main() {
+    // Initialize the system timer
+    timer_init();
+
+    while (1) {
+        // Print "Hello, World!" every 1 second
+        printf("Hello, World!\n");
+        delay_ms(1000);  // Delay for 1000 milliseconds (1 second)
+    }
+
+    return 0;
+}
+
+static void timer_init() {
+    // Assuming the timer is already configured and started
+    // Register the ISR for the system timer interrupt
+    alt_ic_isr_register(SYSTEM_TIMER_IRQ_INTERRUPT_CONTROLLER_ID, SYSTEM_TIMER_IRQ, timer_isr, NULL, NULL);
+}
+
+static void timer_isr(void *context, alt_u32 id) {
+    // Increment the tick count in the interrupt service routine
+    timer_ticks++;
+
+    // Set the delay_completed flag when the desired delay is reached
+    if (timer_ticks >= delay_completed) {
+        delay_completed = 0;  // Reset for the next delay
+        IOWR_ALTERA_AVALON_TIMER_STATUS(SYSTEM_TIMER_BASE, 0);  // Reset timer status
+    }
+}
+
+void delay_ms(int milliseconds) {
+    // Assuming the timer is already started and configured
+    int target_ticks = timer_ticks + (milliseconds * (SYSTEM_TIMER_FREQ / 1000));
+
+    // Set the target_ticks value for the ISR to detect
+    delay_completed = target_ticks;
+
+    // Wait until the delay is completed (handled by the ISR)
+    while (delay_completed != 0) {
+        // Let the system handle other tasks, or your system may have some power-saving instruction here
+    }
+}

@@ -1,0 +1,202 @@
+#include <stdio.h>
+#include <io.h>
+#include "system.h"
+#include "altera_avalon_timer_regs.h"
+#include "altera_avalon_timer.h"
+#include "altera_avalon_pio_regs.h"
+#include "sys/alt_irq.h"
+#include "sys/alt_stdio.h"
+#include "alt_types.h"
+
+
+volatile int edge_capture;
+char hex_table[10] = {0x40, 0x79, 0xA4, 0xB0, 0x99, 0x92,0x82, 0x78,0x80,0x90};
+int count, isr = 0;
+int thousands_hex =0;
+int hundreds_hex =0;
+int tens_hex = 0;
+int ones_hex = 0;
+static void pio_init();
+static void handle_button_interrupts(void* context);
+static void stop_game();
+static void start_game();
+static void game_isr();
+static void display(int x);
+static void counter();
+static void counter_isr();
+
+int main(){
+
+	pio_init();
+//	if(isr == 1){
+//		display(count);
+//	}
+//	isr = 0;
+	return 0;
+}
+
+
+
+
+static void pio_init(){
+	void* edge_capture_ptr = (void*)&edge_capture;
+
+	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0xf);
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+
+	alt_ic_isr_register(KEYS_IRQ_INTERRUPT_CONTROLLER_ID, KEYS_IRQ, (void *) handle_button_interrupts, edge_capture_ptr, 0x00);
+}
+
+static void handle_button_interrupts(void* context){
+	volatile int* edge_capture_ptr = (volatile int*) context;
+
+	*edge_capture_ptr = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+	if(*edge_capture_ptr == 2){
+		start_game();
+	}
+
+	if(*edge_capture_ptr == 4){
+			stop_game();
+		}
+
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+	IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+}
+
+
+
+static void game_timer_init()
+{
+    // Stop the timer
+	IOWR_ALTERA_AVALON_TIMER_CONTROL(SYSTEM_TIMER_BASE,
+				ALTERA_AVALON_TIMER_CONTROL_STOP_MSK);
+
+	// Set the timer period so it can be 1 second
+    int period = SYSTEM_TIMER_LOAD_VALUE * random_time();
+    int period_h = period >> 16;
+    int period_l = period & ALTERA_AVALON_TIMER_PERIODL_MSK;
+
+    IOWR_ALTERA_AVALON_TIMER_PERIODL(SYSTEM_TIMER_BASE, period_l);
+    IOWR_ALTERA_AVALON_TIMER_PERIODH(SYSTEM_TIMER_BASE, period_h);
+
+    // Start the timer
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(SYSTEM_TIMER_BASE,
+    			ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
+    			ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
+    			ALTERA_AVALON_TIMER_CONTROL_START_MSK
+    			);
+
+    alt_ic_isr_register(SYSTEM_TIMER_IRQ_INTERRUPT_CONTROLLER_ID, SYSTEM_TIMER_IRQ, game_isr, NULL, NULL);
+}
+
+static void counter_timer_init()
+{
+    // Stop the timer
+	IOWR_ALTERA_AVALON_TIMER_CONTROL(SYSTEM_TIMER_BASE,
+				ALTERA_AVALON_TIMER_CONTROL_STOP_MSK);
+
+	// Set the timer period so it can be 1 millisecond
+    int period = SYSTEM_TIMER_LOAD_VALUE * 10;
+    int period_h = period >> 16;
+    int period_l = period & ALTERA_AVALON_TIMER_PERIODL_MSK;
+
+    IOWR_ALTERA_AVALON_TIMER_PERIODL(SYSTEM_TIMER_BASE, period_l);
+    IOWR_ALTERA_AVALON_TIMER_PERIODH(SYSTEM_TIMER_BASE, period_h);
+
+    // Start the timer
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(SYSTEM_TIMER_BASE,
+    			ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
+    			ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
+    			ALTERA_AVALON_TIMER_CONTROL_START_MSK
+    			);
+
+    alt_ic_isr_register(SYSTEM_TIMER_IRQ_INTERRUPT_CONTROLLER_ID, SYSTEM_TIMER_IRQ, counter_isr, NULL, NULL);
+}
+
+
+static void start_game(){
+	// clear the display
+	IOWR_ALTERA_AVALON_TIMER_STATUS(SYSTEM_TIMER_BASE, 0);
+	count = 0;
+	clear();
+	game_timer_init();
+
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+	IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+
+	// start the timer and count every millisecond tick
+
+}
+
+
+static void game_isr(){
+	toggle == 0xFFFF ? 0x0 : 0xFFFF;
+	IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE,toggle);
+	counter();
+	//display(random_time());
+}
+
+static void counter(){
+	count = 0;
+	counter_timer_init();
+}
+
+
+static void counter_isr(){
+		IOWR_ALTERA_AVALON_TIMER_STATUS(SYSTEM_TIMER_BASE, 0);
+		count++;
+		//isr = 1;
+		display(count);
+		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+		IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+}
+
+static void stop_game(){
+	IOWR_ALTERA_AVALON_TIMER_STATUS(SYSTEM_TIMER_BASE, 0);
+	count = count;
+    printf("Random number: %d\n", count);
+	display(count);
+	IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE,0xFF);
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+	IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+}
+
+
+static void display(int x){
+	int i = 1;
+	// while(i){
+		    thousands_hex = 0;
+		    hundreds_hex = 0;
+		    tens_hex = 0;
+		    ones_hex = 0;
+
+		    while(x > 1000){
+		   		  	  x = x -1;
+		   		  	  thousands_hex++;
+		   		    }
+		    while(x > 100){
+		  	  x = x -100;
+		  	  hundreds_hex++;
+		    }
+		    while(x > 10){
+		    	  x = x -10;
+		    	  tens_hex++;
+		      }
+		    while(x > 0){
+		  	  x = x -1;
+		  	  ones_hex++;
+		    }
+
+
+		    IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_0_BASE, hex_table[ones_hex]);
+		    IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_1_BASE, hex_table[tens_hex]);
+		    IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_2_BASE, hex_table[hundreds_hex]);
+		    IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_3_BASE, hex_table[thousands_hex]);
+		    i = 0;
+
+		 //   }
+}

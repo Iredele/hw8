@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <unistd.h>
+#include "altera_avalon_pio_regs.h"
+#include "sys/alt_irq.h"
+#include "system.h"
+#include "alt_types.h"
+#include "altera_avalon_timer_regs.h"
+
+
+char start[5] = {0x40, 0x79, 0x10, 0x0E, 0x92};
+volatile int edge_capture;
+
+
+static void pio_init();
+static void handle_button_interrupts(void* context);
+static void sys_init();
+
+int main(){
+
+	pio_init();
+	return 0;
+}
+
+
+
+
+static void pio_init(){
+	void* edge_capture_ptr = (void*)&edge_capture;
+
+	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0xf);
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+
+	alt_ic_isr_register(KEYS_IRQ_INTERRUPT_CONTROLLER_ID, KEYS_IRQ, (void *) handle_button_interrupts, edge_capture_ptr, 0x00);
+}
+
+static void handle_button_interrupts(void* context){
+	volatile int* edge_capture_ptr = (volatile int*) context;
+
+	*edge_capture_ptr = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+	//sw_val = IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE);
+	//sw_val = sw_val & 0xFF;
+
+	if(*edge_capture_ptr == 1){
+		sys_init();
+	}
+
+//	if(*edge_capture_ptr == 2){
+//		key2_isr();
+//	}
+//
+//	if(*edge_capture_ptr == 4){
+//			key3_isr();
+//		}
+
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+	IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+
+}
+
+static void sys_init(){
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_0_BASE,start[0]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_1_BASE,start[1]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_2_BASE,start[2]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_3_BASE,start[3]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_4_BASE,start[4]);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_5_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_6_BASE,0xFF);
+		IOWR_ALTERA_AVALON_PIO_DATA(SEVEN_SEG_7_BASE,0xFF);
+
+		IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE,0x0);
+
+		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0x0);
+		IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+}

@@ -1,0 +1,125 @@
+22:50:55 **** Incremental Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+Info: Compiling hello_world.c to obj/default/hello_world.o
+nios2-elf-gcc -xc -MP -MMD -c -I../gen/HAL/inc -I../gen -I../gen/drivers/inc  -pipe -D__hal__ -DALT_NO_INSTRUCTION_EMULATION -DALT_SINGLE_THREADED    -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o obj/default/hello_world.o hello_world.c
+Info: Linking pt1_1.elf
+nios2-elf-g++  -T'../gen/linker.x' -msys-crt0='../gen/obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../gen   -Wl,-Map=pt1_1.map   -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o pt1_1.elf obj/default/hello_world.o -lm -msys-lib=m
+nios2-elf-insert pt1_1.elf --thread_model hal --cpu_name nios2_qsys_0 --qsys true --simulation_enabled false --id 16843008 --sidp 0x201000 --timestamp 1697563669 --stderr_dev jtag_uart_0 --stdin_dev jtag_uart_0 --stdout_dev jtag_uart_0 --sopc_system_name niosII_system --quartus_project_dir "D:/hw8" --sopcinfo D:/hw8/software/gen/../../NEW5_niosII_system.sopcinfo
+Info: (pt1_1.elf) 69 KBytes program size (code + initialized data).
+Info:             130996 KBytes free for stack + heap.
+Info: Creating pt1_1.objdump
+nios2-elf-objdump --disassemble --syms --all-header --source pt1_1.elf >pt1_1.objdump
+[pt1_1 build complete]
+22:51:13 **** Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+[pt1_1 build complete]
+22:51:14 **** Incremental Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+[pt1_1 build complete]
+22:53:32 **** Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+Info: Compiling hello_world.c to obj/default/hello_world.o
+nios2-elf-gcc -xc -MP -MMD -c -I../gen/HAL/inc -I../gen -I../gen/drivers/inc  -pipe -D__hal__ -DALT_NO_INSTRUCTION_EMULATION -DALT_SINGLE_THREADED    -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o obj/default/hello_world.o hello_world.c
+hello_world.c: In function 'handle_button_interrupts':
+hello_world.c:82:23: warning: comparison between pointer and integer
+  if(*edge_capture_ptr == "p"){ //112
+                       ^
+hello_world.c:82:23: warning: comparison with string literal results in unspecified behavior [-Waddress]
+hello_world.c:86:23: warning: comparison between pointer and integer
+  if(*edge_capture_ptr == "s"){ //115
+                       ^
+hello_world.c:86:23: warning: comparison with string literal results in unspecified behavior [-Waddress]
+hello_world.c:90:23: warning: comparison between pointer and integer
+  if(*edge_capture_ptr == "c"){ //99
+                       ^
+hello_world.c:90:23: warning: comparison with string literal results in unspecified behavior [-Waddress]
+Info: Linking pt1_1.elf
+nios2-elf-g++  -T'../gen/linker.x' -msys-crt0='../gen/obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../gen   -Wl,-Map=pt1_1.map   -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o pt1_1.elf obj/default/hello_world.o -lm -msys-lib=m
+nios2-elf-insert pt1_1.elf --thread_model hal --cpu_name nios2_qsys_0 --qsys true --simulation_enabled false --id 16843008 --sidp 0x201000 --timestamp 1697563669 --stderr_dev jtag_uart_0 --stdin_dev jtag_uart_0 --stdout_dev jtag_uart_0 --sopc_system_name niosII_system --quartus_project_dir "D:/hw8" --sopcinfo D:/hw8/software/gen/../../NEW5_niosII_system.sopcinfo
+Info: (pt1_1.elf) 69 KBytes program size (code + initialized data).
+Info:             130996 KBytes free for stack + heap.
+Info: Creating pt1_1.objdump
+nios2-elf-objdump --disassemble --syms --all-header --source pt1_1.elf >pt1_1.objdump
+[pt1_1 build complete]
+22:53:33 **** Incremental Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+[pt1_1 build complete]
+23:00:18 **** Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+Info: Compiling hello_world.c to obj/default/hello_world.o
+nios2-elf-gcc -xc -MP -MMD -c -I../gen/HAL/inc -I../gen -I../gen/drivers/inc  -pipe -D__hal__ -DALT_NO_INSTRUCTION_EMULATION -DALT_SINGLE_THREADED    -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o obj/default/hello_world.o hello_world.c
+hello_world.c: In function 'handle_button_interrupts':
+hello_world.c:84:10: warning: comparison between pointer and integer
+  if(data == "p"){ //112
+          ^
+hello_world.c:84:10: warning: comparison with string literal results in unspecified behavior [-Waddress]
+hello_world.c:88:10: warning: comparison between pointer and integer
+  if(data == "s"){ //115
+          ^
+hello_world.c:88:10: warning: comparison with string literal results in unspecified behavior [-Waddress]
+hello_world.c:92:10: warning: comparison between pointer and integer
+  if(data == "c"){ //99
+          ^
+hello_world.c:92:10: warning: comparison with string literal results in unspecified behavior [-Waddress]
+Info: Linking pt1_1.elf
+nios2-elf-g++  -T'../gen/linker.x' -msys-crt0='../gen/obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../gen   -Wl,-Map=pt1_1.map   -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o pt1_1.elf obj/default/hello_world.o -lm -msys-lib=m
+nios2-elf-insert pt1_1.elf --thread_model hal --cpu_name nios2_qsys_0 --qsys true --simulation_enabled false --id 16843008 --sidp 0x201000 --timestamp 1697563669 --stderr_dev jtag_uart_0 --stdin_dev jtag_uart_0 --stdout_dev jtag_uart_0 --sopc_system_name niosII_system --quartus_project_dir "D:/hw8" --sopcinfo D:/hw8/software/gen/../../NEW5_niosII_system.sopcinfo
+Info: (pt1_1.elf) 69 KBytes program size (code + initialized data).
+Info:             130996 KBytes free for stack + heap.
+Info: Creating pt1_1.objdump
+nios2-elf-objdump --disassemble --syms --all-header --source pt1_1.elf >pt1_1.objdump
+[pt1_1 build complete]
+23:00:21 **** Incremental Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+[pt1_1 build complete]
+23:01:03 **** Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+Info: Compiling hello_world.c to obj/default/hello_world.o
+nios2-elf-gcc -xc -MP -MMD -c -I../gen/HAL/inc -I../gen -I../gen/drivers/inc  -pipe -D__hal__ -DALT_NO_INSTRUCTION_EMULATION -DALT_SINGLE_THREADED    -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o obj/default/hello_world.o hello_world.c
+hello_world.c: In function 'handle_button_interrupts':
+hello_world.c:88:10: warning: comparison between pointer and integer
+  if(data == "s"){ //115
+          ^
+hello_world.c:88:10: warning: comparison with string literal results in unspecified behavior [-Waddress]
+hello_world.c:92:10: warning: comparison between pointer and integer
+  if(data == "c"){ //99
+          ^
+hello_world.c:92:10: warning: comparison with string literal results in unspecified behavior [-Waddress]
+Info: Linking pt1_1.elf
+nios2-elf-g++  -T'../gen/linker.x' -msys-crt0='../gen/obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../gen   -Wl,-Map=pt1_1.map   -O0 -g -Wall   -mno-hw-div -mhw-mul -mno-hw-mulx -mgpopt=global  -o pt1_1.elf obj/default/hello_world.o -lm -msys-lib=m
+nios2-elf-insert pt1_1.elf --thread_model hal --cpu_name nios2_qsys_0 --qsys true --simulation_enabled false --id 16843008 --sidp 0x201000 --timestamp 1697563669 --stderr_dev jtag_uart_0 --stdin_dev jtag_uart_0 --stdout_dev jtag_uart_0 --sopc_system_name niosII_system --quartus_project_dir "D:/hw8" --sopcinfo D:/hw8/software/gen/../../NEW5_niosII_system.sopcinfo
+Info: (pt1_1.elf) 69 KBytes program size (code + initialized data).
+Info:             130996 KBytes free for stack + heap.
+Info: Creating pt1_1.objdump
+nios2-elf-objdump --disassemble --syms --all-header --source pt1_1.elf >pt1_1.objdump
+[pt1_1 build complete]
+23:01:05 **** Incremental Build of configuration Nios II for project pt1_1 ****
+make all 
+Info: Building ../gen
+C:/intelFPGA_lite/16.1/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../gen
+[BSP build complete]
+[pt1_1 build complete]
